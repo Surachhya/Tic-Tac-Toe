@@ -1,4 +1,4 @@
-# 🧩 Tic-Tac-Toe (Multiplayer Over Sockets)
+# Tic-Tac-Toe (Multiplayer Over Sockets)
 
 This is a simple multiplayer Tic-Tac-Toe game built in C++ using sockets.  
 It includes a **Server** and **Client** program so multiple players can connect and play from different terminals.
@@ -71,7 +71,7 @@ make
 
 ---
 
-## 🛠 Build Notes
+##  Build Notes
 
 - The project uses Windows networking (`winsock2.h`), so make sure you link **Ws2_32**.
 - The Makefile already does this:  
@@ -80,8 +80,6 @@ make
   ```
 
 ---
-
-## You're ready!
 
 Now run the server, open two clients, and play Tic-Tac-Toe over the network.
 
