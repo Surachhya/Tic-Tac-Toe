@@ -81,8 +81,6 @@ class TicTacToeClient:
                     self.master.after(0, self.process_message, msg.strip())
             except:
                 break
-        if not getattr(self, "game_over", False):
-            self.master.after(0, lambda: messagebox.showinfo("Disconnected", "Server closed connection"))
 
 
     def process_message(self, msg):
@@ -98,6 +96,7 @@ class TicTacToeClient:
             self.info_label.config(text="Your turn!")
             self.enable_empty_buttons()
         elif msg.startswith("UPDATE"):
+            # Update board with opponent's move
             _, pos, sym = msg.split()
             pos = int(pos)-1
             row, col = divmod(pos, 3)
@@ -127,7 +126,7 @@ class TicTacToeClient:
             
             return
 
-
+    # Reset the board visually, clean buttons
     def reset_board(self):
         for row in self.buttons:
             for btn in row:
@@ -136,23 +135,26 @@ class TicTacToeClient:
                 btn["bg"] = "SystemButtonFace"
         self.last_move = None
 
+    # Enable buttons that are empty
     def enable_empty_buttons(self):
         for row in self.buttons:
             for btn in row:
                 if btn["text"] == " ":
                     btn["state"] = "normal"
 
+    # Disable all buttons
     def disable_all_buttons(self):
         for row in self.buttons:
             for btn in row:
                 btn["state"] = "disabled"
-
+    
+     # Request a restart 
     def restart_game(self):
         # Reset board locally and tell server to restart (server may need additional logic)
         self.reset_board()
         self.info_label.config(text="Restart requested")
-        # Optional: send a restart signal if server supports
-        # self.client.sendall(b"RESTART\n")
+        # Send a restart signal
+        self.client.sendall(b"RESTART\n")
 
 if __name__ == "__main__":
     root = tk.Tk()
