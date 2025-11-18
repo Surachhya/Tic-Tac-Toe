@@ -116,8 +116,8 @@ class TicTacToeClient:
             self.disable_all_buttons()
         elif msg in ["YOU_WIN", "YOU_LOSE", "DRAW"]:
             self.my_turn = False
-            result_text = {"YOU_WIN":"You Win!", "YOU_LOSE":"You Lose!", "DRAW":"Draw!"}[msg]
-            
+            result_text = {"YOU_WIN":"Hurray, You Win!", "YOU_LOSE":"Sorry, You Lose!", "DRAW":"Draw!"}[msg]
+            result_text = f"Game Over: /nHello {self.symbol} : {result_text}"
             # Show popup first
             messagebox.showinfo("Game Over", result_text)
             

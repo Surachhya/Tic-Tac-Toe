@@ -48,6 +48,8 @@ def receive_move(sock, symbol):
         return None
     msg = data.decode().strip()
     log(f"Received from {symbol}: {msg}")
+    if msg.upper() == "RESTART":
+        return "RESTART"
     if not msg.isdigit():
         sock.sendall(b"INVALID\n")
         return None
@@ -56,6 +58,32 @@ def receive_move(sock, symbol):
         sock.sendall(b"INVALID\n")
         return None
     return pos
+
+def reset_board_and_notify_clients():
+    # Reset the board and notify both clients to start a new game.
+    global board, turn_idx
+
+    with lock:
+        # Reset board and turn
+        board = [" "] * 9
+        turn_idx = 0
+
+        # Notify both players
+        for sock, symbol in players:
+            try:
+                sock.sendall(b"START\n")
+                sock.sendall(f"SYMBOL {symbol}\n".encode())
+            except Exception as e:
+                print(f"Error sending reset to {symbol}: {e}")
+
+        # Let the first player know it's their turn
+        try:
+            first_sock, first_symbol = players[turn_idx]
+            first_sock.sendall(b"YOUR_TURN\n")
+            print(f"Board reset. Player {first_symbol} turn")
+        except Exception as e:
+            print(f"Error notifying first turn: {e}")
+
 
 def make_move(pos, symbol, sock):
     #Apply the move to the board and notify all clients.
@@ -95,6 +123,9 @@ def handle_client(sock, symbol):
     while True:
         try:
             pos = receive_move(sock, symbol)
+            if pos == "RESTART":
+                reset_board_and_notify_clients()
+                continue
             if pos is None:
                 continue  # invalid or non-digit input
             with lock:
@@ -113,8 +144,7 @@ def handle_client(sock, symbol):
                 make_move(pos, symbol, sock)
 
                 # Check if game ended
-                if check_game_status(symbol, sock):
-                    break
+                check_game_status(symbol, sock)
 
                 # Switch turn
                 switch_turn()
