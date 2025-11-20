@@ -15,15 +15,15 @@ class TicTacToeClient:
         self.buttons = []
         self.last_move = None
 
-        # Info label
         self.info_label = tk.Label(master, text="Connecting...", font=("Arial", 14))
         self.info_label.grid(row=0, column=0, columnspan=3, pady=10)
 
-        # Restart button
         self.restart_btn = tk.Button(master, text="Restart", font=("Arial", 12), command=self.restart_game)
         self.restart_btn.grid(row=4, column=0, columnspan=3, pady=5)
 
-        # Create buttons 3x3
+        self.quit_btn = tk.Button(master, text="Quit Game", font=("Arial", 12), command=self.quit_game)
+        self.quit_btn.grid(row=5, column=0, columnspan=3, pady=5)
+
         for i in range(3):
             row_buttons = []
             for j in range(3):
@@ -33,8 +33,7 @@ class TicTacToeClient:
                 row_buttons.append(btn)
             self.buttons.append(row_buttons)
 
-        # Connect to server
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)     #Connect to server
         try:
             self.client.connect((HOST, PORT))
         except Exception as e:
@@ -57,13 +56,11 @@ class TicTacToeClient:
         self.client.sendall(str(pos).encode())
         print(f"Sent move: {pos}")
 
-        # Immediately update button to show user click
         btn["text"] = self.symbol
         btn["state"] = "disabled"
         self.my_turn = False
         self.info_label.config(text="Opponent's turn...")
 
-        # Highlight last move
         if self.last_move:
             self.last_move["bg"] = "SystemButtonFace"
         btn["bg"] = "lightgreen"
@@ -77,7 +74,7 @@ class TicTacToeClient:
                     break
                 for msg in data.decode().strip().splitlines():
                     if getattr(self, "game_over", False):
-                        continue  # ignore messages after game over
+                        continue    #Ignore messages after game over
                     self.master.after(0, self.process_message, msg.strip())
             except:
                 break
@@ -95,21 +92,20 @@ class TicTacToeClient:
             self.my_turn = True
             self.info_label.config(text="Your turn!")
             self.enable_empty_buttons()
-        elif msg.startswith("UPDATE"):
-            # Update board with opponent's move
+        elif msg.startswith("UPDATE"): #Update board with opponent move
             _, pos, sym = msg.split()
             pos = int(pos)-1
             row, col = divmod(pos, 3)
             btn = self.buttons[row][col]
             btn["text"] = sym
             btn["state"] = "disabled"
-            # Highlight opponent move
-            if self.last_move:
+
+            if self.last_move:  #Highlights opponent move
                 self.last_move["bg"] = "SystemButtonFace"
             btn["bg"] = "lightblue"
             self.last_move = btn
         elif msg.startswith("MOVE_OK"):
-            pass  # Already updated locally
+            pass  #Already updated locally
         elif msg == "NOT_YOUR_TURN":
             self.my_turn = False
             self.info_label.config(text="Opponent's turn...")
@@ -118,15 +114,14 @@ class TicTacToeClient:
             self.my_turn = False
             result_text = {"YOU_WIN":"Hurray, You Win!", "YOU_LOSE":"Sorry, You Lose!", "DRAW":"Draw!"}[msg]
             result_text = f"Game Over: /nHello {self.symbol} : {result_text}"
-            # Show popup first
             messagebox.showinfo("Game Over", result_text)
-            
-            # Disable buttons after popup
             self.disable_all_buttons()
-            
-            return
+        elif msg == "OPPONENT_QUIT":
+            messagebox.showinfo("Game Over", "Your opponent has quit the game.")
+            self.disable_all_buttons()
+            self.quit_game()    #Exit game completely after quitting
+            #return
 
-    # Reset the board visually, clean buttons
     def reset_board(self):
         for row in self.buttons:
             for btn in row:
@@ -135,26 +130,27 @@ class TicTacToeClient:
                 btn["bg"] = "SystemButtonFace"
         self.last_move = None
 
-    # Enable buttons that are empty
     def enable_empty_buttons(self):
         for row in self.buttons:
             for btn in row:
                 if btn["text"] == " ":
                     btn["state"] = "normal"
 
-    # Disable all buttons
     def disable_all_buttons(self):
         for row in self.buttons:
             for btn in row:
                 btn["state"] = "disabled"
     
-     # Request a restart 
-    def restart_game(self):
-        # Reset board locally and tell server to restart (server may need additional logic)
+    def restart_game(self):     #Reset board locally and tell server to restart
         self.reset_board()
         self.info_label.config(text="Restart requested")
-        # Send a restart signal
         self.client.sendall(b"RESTART\n")
+
+    def quit_game(self):
+        self.client.sendall(b"QUIT\n")
+        print("Sent quit message to server")
+        self.client.close()     #Close client connection
+        self.master.quit()      #Closes window
 
 if __name__ == "__main__":
     root = tk.Tk()
