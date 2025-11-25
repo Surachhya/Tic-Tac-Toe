@@ -3,7 +3,7 @@ import threading
 import tkinter as tk
 from tkinter import messagebox
 
-HOST = "10.0.0.146" # Server IP address (we need to copy from wifi details)
+HOST = "172.20.10.2" # Server IP address (we need to copy from wifi details)
 PORT = 12345 # this also needs to match the server port
 
 class TicTacToeClient:
@@ -113,7 +113,7 @@ class TicTacToeClient:
         elif msg in ["YOU_WIN", "YOU_LOSE", "DRAW"]:
             self.my_turn = False
             result_text = {"YOU_WIN":"Hurray, You Win!", "YOU_LOSE":"Sorry, You Lose!", "DRAW":"Draw!"}[msg]
-            result_text = f"Game Over: \nHello Player {self.symbol} : {result_text}"
+            result_text = f"Game Over: Player {self.symbol} : {result_text}"
             messagebox.showinfo("Game Over", result_text)
             self.disable_all_buttons()
         elif msg == "OPPONENT_QUIT":
