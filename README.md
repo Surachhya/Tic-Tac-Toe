@@ -8,6 +8,7 @@ This project is a multiplayer Tic-Tac-Toe game built in Python, supporting both:
 Players connect over a local network and take turns playing in real time. The server handles all game logic, synchronization, and communication between clients.
 
 # Project Structure
+```bash
 TIC-TAC-TOE/
 │
 ├── CPP/                      # Legacy C++ version (deprecated)
@@ -20,6 +21,7 @@ TIC-TAC-TOE/
     └── ui/                   # Tkinter GUI implementation (recommended)
         ├── client.py
         └── server.py
+```
 
 # Requirements
 Python 3.8+
