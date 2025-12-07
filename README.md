@@ -1,85 +1,55 @@
 # Tic-Tac-Toe (Multiplayer Over Sockets)
 
-This is a simple multiplayer Tic-Tac-Toe game built in C++ using sockets.  
-It includes a **Server** and **Client** program so multiple players can connect and play from different terminals.
+This project is a multiplayer Tic-Tac-Toe game built in Python, supporting both:
 
----
+1. Terminal-based client/server
+2. Tkinter GUI client/server
 
-## Requirements (Windows)
+Players connect over a local network and take turns playing in real time. The server handles all game logic, synchronization, and communication between clients.
 
-Because this project uses `make`, ensure that **make** is installed on Windows.  
-You can install it through:
+# Project Structure
+TIC-TAC-TOE/
+│
+├── CPP/                      # Legacy C++ version (deprecated)
+│
+└── Python/
+    ├── terminal/             # Terminal-only implementation
+    │   ├── client.py
+    │   └── server.py
+    │
+    └── ui/                   # Tkinter GUI implementation (recommended)
+        ├── client.py
+        └── server.py
 
-### Option 1 — **MSYS2** (Recommended)
-1. Install from https://www.msys2.org/
-2. Open **MSYS2 MinGW64** terminal
-3. Install tools:  
-   ```sh
-   pacman -S make gcc
-   ```
+# Requirements
+Python 3.8+
+Tkinter (comes preinstalled with most Python distributions)
+Clients must be on the same local network as the server
+No additional packages are required—this project uses only the Python standard library.
 
-### Option 2 — **GNU Make for Windows**
-Download "make" binary and place it in `C:\Program Files\GnuWin32\bin`  
-Then add it to **PATH**.
+# How to Run (Tkinter GUI Version — Recommended)
 
----
+Run these commands from the project root or navigate manually.
+1. Navigate to the GUI folder
+cd Python/ui
+2. Start the server
+python server.py
+3. Start Client 1 (new terminal)
+python client.py
+4. Start Client 2 (another terminal or another machine on the same network)
+python client.py
 
-## How to Build & Run
+Both clients must be on the same local network and connect to the server’s IP address.
 
-Run all commands **from the project root**, where your `Makefile` is located.
+# Running the Terminal Version (Optional)
+If you want a simpler, text-only experience:
+cd Python/terminal
+python server.py
+python client.py   # Run twice for two players
 
-### 1 Build the project
-```sh
-make
-```
-
-### 1 Start the Server
-```sh
-./Server
-```
-
-### 3 Start Client 1 (new terminal)
-```sh
-./Client
-```
-
-### 4 Start Client 2 (another terminal)
-```sh
-./Client
-```
-
----
-
-## How to Play ( we need to build Gui later; I am thinking using IMGUI)
- 
- Instruction for now:
-
-- Two clients connect to the server.
-- The server coordinates turns and board updates.
-- Players play directly **in the terminal**.
-- Enter positions (1–9) when prompted.
-
----
-
-## Files Overview
-
-| File | Description |
-|------|-------------|
-| `Server.cpp` | Main server logic handling clients and game state |
-| `Client.cpp` | Client-side interaction and user moves |
-| `Makefile` | Builds Server and Client executables |
-
----
-
-##  Build Notes
-
-- The project uses Windows networking (`winsock2.h`), so make sure you link **Ws2_32**.
-- The Makefile already does this:  
-  ```
-  -lws2_32
-  ```
-
----
-
-Now run the server, open two clients, and play Tic-Tac-Toe over the network.
-
+# How to Play
+- The server waits for two clients to join.
+- Each client is assigned X or O.
+- Players take turns clicking (GUI) or typing numbers 1–9 (terminal).
+- The server validates moves, updates game state, and sends updates to both players.
+- Games end with win, loss, or draw, and players may restart or quit the game.
